@@ -1,0 +1,12 @@
+{
+  "name": "kz-job-web",
+  "version": "1.0.0",
+  "description": "哈萨克斯坦华人职通车 - 极简招聘平台",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'No build step required for static site'"
+  },
+  "dependencies": {
+    "nodemailer": "^6.9.1"
+  }
+}

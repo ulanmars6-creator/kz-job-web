@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>哈萨克斯坦华人职通车 - 极简招聘平台</title>
+    <!-- 使用 Tailwind CSS 快速实现高颜值设计 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 极致的苹果系统字体库 */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", "Helvetica Neue", sans-serif;
+            -webkit-font-smoothing: antialiased; /* 让 Mac 上的字体看起来更细致 */
+            background-color: #ffffff;
+        }
+        /* 导航栏的磨砂玻璃效果 */
+        .apple-nav {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: saturate(180%) blur(20px);
+            -webkit-backdrop-filter: saturate(180%) blur(20px);
+        }
+        .btn-apple {
+            background-color: #0071e3;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        .btn-apple:hover {
+            background-color: #0077ed;
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+<body class="text-[#1d1d1f]">
+
+    <!-- 顶部导航栏 -->
+    <nav class="apple-nav fixed top-0 w-full z-50 border-b border-gray-200/50">
+        <div class="max-w-[1024px] mx-auto px-6 h-[48px] flex items-center justify-between text-sm font-light">
+            <div class="flex items-center text-xl font-bold tracking-tight">
+                <img src="https://flagcdn.com/24x18/kz.png" alt="哈萨克斯坦国旗" data-lang="kk" id="flag-kz" class="w-5 h-4 rounded-sm mr-2 cursor-pointer opacity-60" aria-label="Қазақша">
+                <img src="https://flagcdn.com/24x18/cn.png" alt="中国国旗" data-lang="zh" id="flag-cn" class="w-5 h-4 rounded-sm mr-3 cursor-pointer opacity-100" aria-label="中文">
+                <span>KZ Job</span>
+            </div>
+            <div class="hidden md:flex space-x-6 text-gray-600 items-center">
+                <a href="#" class="hover:text-black transition" data-i18n="nav_search">职位搜索</a>
+                <a href="#" class="hover:text-black transition" data-i18n="nav_post">发布招聘</a>
+                <a href="#" class="hover:text-black transition" data-i18n="nav_news">哈国资讯</a>
+                <a href="#" id="btn-post-seek" class="hover:text-black transition text-sm px-3 py-1 rounded-full border border-gray-200" data-i18n="post_seek">发布求职</a>
+            </div>
+            <div id="auth-area">
+                <button id="btn-login" class="btn-apple px-4 py-1 rounded-full text-xs" data-i18n="login">登录</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 巨幕区 (Hero Section) -->
+    <section class="pt-32 pb-20 text-center">
+        <div class="max-w-3xl mx-auto px-6">
+            <h1 class="text-5xl md:text-7xl font-bold tracking-tight mb-6" data-i18n="hero_title">更简单的找工作方式。</h1>
+            <p class="text-xl md:text-2xl text-gray-500 font-normal mb-10" data-i18n="hero_sub">专为在哈华人打造的纯净、高效的招聘站。</p>
+            
+            <!-- 仿苹果搜索框 -->
+            <div class="max-w-xl mx-auto flex p-2 bg-[#f5f5f7] rounded-2xl shadow-inner">
+                <input type="text" placeholder="搜索：阿斯塔纳 翻译" data-i18n="search_placeholder" class="flex-1 bg-transparent px-4 py-2 outline-none text-lg">
+                <button class="btn-apple px-6 py-2 rounded-xl font-medium" data-i18n="search_button">搜索</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- 精选资讯与企业模块 -->
+    <main class="max-w-[1024px] mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-8 py-10">
+        <!-- 资讯卡片 -->
+        <div class="bg-[#f5f5f7] rounded-[28px] p-10 hover:shadow-xl transition-shadow duration-500">
+            <h3 class="text-xs font-bold text-orange-600 mb-2" data-i18n="latest">最新动态</h3>
+            <h2 class="text-3xl font-bold mb-4 leading-tight">2026 赴哈务工<br>签证全流程解析</h2>
+            <p class="text-gray-500 mb-8">从材料准备到入境，避开所有“坑”。</p>
+            <a href="#" class="text-blue-600 font-medium" data-i18n="read_more">立即阅读 ></a>
+        </div>
+
+        <!-- 企业卡片 -->
+        <div class="bg-black text-white rounded-[28px] p-10 hover:shadow-xl transition-shadow duration-500">
+            <h3 class="text-xs font-bold text-blue-400 mb-2" data-i18n="employer">雇主入口</h3>
+            <h2 class="text-3xl font-bold mb-4 leading-tight" data-i18n="employer_title">在哈寻找<br>双语华人人才</h2>
+            <p class="text-gray-400 mb-8">即刻发布岗位，与哈国最优秀的华人候选人建立连接。</p>
+            <button class="bg-white text-black px-6 py-2 rounded-full font-medium hover:bg-gray-200" data-i18n="employer_button">开始招聘</button>
+        </div>
+        <!-- 职位列表容器 -->
+<section class="max-w-[1024px] mx-auto px-6 py-12">
+    <h2 class="text-2xl font-bold mb-8" data-i18n="jobs_title">最新急招岗位</h2>
+    <div class="grid gap-4">
+        
+        <!-- 单个职位卡片：你可以复制多份这个 div -->
+        <div class="group bg-white border border-gray-100 p-6 rounded-[20px] flex justify-between items-center hover:shadow-xl hover:border-transparent transition-all duration-300 cursor-pointer">
+            <div class="flex items-center space-x-4">
+                <!-- 模拟公司 Logo -->
+                <div class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center font-bold text-gray-400">中</div>
+                <div>
+                    <h3 class="text-lg font-bold group-hover:text-blue-600 transition-colors">中俄双语项目助理</h3>
+                    <p class="text-sm text-gray-500">某大型物流公司 · 阿拉木图 · 全职</p>
+                </div>
+            </div>
+            <div class="text-right">
+                <span class="text-lg font-semibold text-[#1d1d1f]">1800$ - 2500$</span>
+                <p class="text-xs text-gray-400 mt-1" data-i18n="job_time">3小时前发布</p>
+            </div>
+        </div>
+
+    </div>
+</section>
+    </main>
+
+    <!-- 求职意向列表 -->
+    <section class="max-w-[1024px] mx-auto px-6 py-8" id="seek-section">
+        <h2 class="text-2xl font-bold mb-6" data-i18n="seek_list_title">求职意向</h2>
+        <div id="seek-list" class="grid gap-4">
+            <!-- 动态渲染求职意向 -->
+        </div>
+        <p id="seek-empty" class="text-gray-500 mt-4" data-i18n="seek_no_items">暂无求职意向，点击“发布求职”创建第一条。</p>
+    </section>
+
+    <!-- 底部 -->
+    <footer class="py-20 text-center text-gray-400 text-xs">
+        <p data-i18n="footer">© 2026 哈萨克斯坦华人职通车. 版权所有.</p>
+    </footer>
+
+    <script>
+        const translations = {
+            zh: {
+                nav_search: '职位搜索',
+                nav_post: '发布招聘',
+                nav_news: '哈国资讯',
+                login: '登录',
+                hero_title: '更简单的找工作方式。',
+                hero_sub: '专为在哈华人打造的纯净、高效的招聘站。',
+                search_placeholder: '搜索：阿斯塔纳 翻译',
+                search_button: '搜索',
+                latest: '最新动态',
+                read_more: '立即阅读 >',
+                employer: '雇主入口',
+                employer_title: '在哈寻找\n双语华人人才',
+                employer_button: '开始招聘',
+                jobs_title: '最新急招岗位',
+                job_time: '3小时前发布',
+                footer: '© 2026 哈萨克斯坦华人职通车. 版权所有.',
+                post_seek: '发布求职',
+                seek_list_title: '求职意向',
+                seek_no_items: '暂无求职意向，点击“发布求职”创建第一条。',
+                seek_modal_title: '发布求职意向',
+                seek_name: '姓名',
+                seek_contact: '联系方式',
+                seek_city: '目标城市',
+                seek_position: '期望职位',
+                seek_summary: '个人简介 / 工作经验',
+                seek_salary: '薪资期望',
+                seek_submit: '发布',
+                seek_cancel: '取消',
+                seek_posted_time: '发布于',
+                seek_sync_label: '同步到服务器',
+                sync_success: '已同步到服务器',
+                sync_fail: '同步失败（已保存到本地）',
+                sync_no_endpoint: '未配置 API_ENDPOINT，无法同步',
+                login: '登录',
+                login_modal_title: '邮箱登录',
+                login_email: '邮箱地址',
+                login_send_code: '发送验证码',
+                login_code_placeholder: '输入验证码',
+                login_verify: '验证并登录',
+                login_logout: '退出登录',
+                login_sent_notice: '验证码已发送（开发模式会在页面显示）',
+                login_invalid_code: '验证码错误或已过期',
+                login_logged_in: '已登录：'
+            },
+            kk: {
+                nav_search: 'Жұмыс іздеу',
+                nav_post: 'Жұмыс жариялау',
+                nav_news: 'Қазақ жаңалықтары',
+                login: 'Кіру',
+                hero_title: 'Жұмыс табудың оңай жолы.',
+                hero_sub: 'Қазақстандағы қытай азаматтары үшін таза және тиімді жұмыс іздеу платформасы.',
+                search_placeholder: 'Іздеу: Астана аудармашы',
+                search_button: 'Іздеу',
+                latest: 'Соңғы жаңалықтар',
+                read_more: 'Оқу >',
+                employer: 'Жұмыс беруші',
+                employer_title: 'Қазақстанда екі тілде\nмамандарды табу',
+                employer_button: 'Жариялау',
+                jobs_title: 'Жедел бос жұмыс орындары',
+                job_time: '3 сағат бұрын жарияланған',
+                footer: '© 2026 Қызмет. Құқықтар қорғалады.',
+                post_seek: 'Жұмыс іздеу жариялау',
+                seek_list_title: 'Жұмыс іздеу ниеттері',
+                seek_no_items: 'Жұмыс іздеу ниеті жоқ, "Жұмыс іздеу жариялау" түймесін басып бірінші жазбаны жасаңыз.',
+                seek_modal_title: 'Жұмыс іздеу жариялау',
+                seek_name: 'Аты-жөні',
+                seek_contact: 'Байланыс',
+                seek_city: 'Мақсатты қала',
+                seek_position: 'Қалаған лауазым',
+                seek_summary: 'Өздігіңіз / Жұмыс тәжірибесі',
+                seek_salary: 'Еңбек ақы талабы',
+                seek_submit: 'Жариялау',
+                seek_cancel: 'Болдырмау',
+                seek_posted_time: 'Жарияланған',
+                seek_sync_label: 'Серверге синхрондау',
+                sync_success: 'Серверге синхрондалды',
+                sync_fail: 'Синхрондау сәтсіз аяқталды (жергілікті түрде сақталды)',
+                sync_no_endpoint: 'API_ENDPOINT конфигурацияланбаған, синхрондау мүмкін емес',
+                login: 'Кіру',
+                login_modal_title: 'Электрондық пошта арқылы кіру',
+                login_email: 'Электрондық пошта',
+                login_send_code: 'Рұқсат кодын жіберу',
+                login_code_placeholder: 'Кодты енгізіңіз',
+                login_verify: 'Тексеру және кіріс',
+                login_logout: 'Шығу',
+                login_sent_notice: 'Код жіберілді (разработка режимінде код бетті көрсетеді)',
+                login_invalid_code: 'Код қате немесе мерзімі өткен',
+                login_logged_in: 'Кіруші:'
+            }
+        };
+
+        // 如果要启用同步，请在下面填写你的后端 API 地址，例如: '/api/seeks' 或 'https://yourdomain.com/seeks'
+        const API_ENDPOINT = '/api/seeks';
+        // 若配置后端以发送邮箱验证码，可设置 AUTH_API_ENDPOINT 为 POST 接收 { email } 的端点
+        // 如果未配置，开发模式会生成本地验证码并在页面显示（仅用于测试）
+        const AUTH_API_ENDPOINT = '';
+
+        // 简单邮箱登录实现（前端）：
+        // - sendVerification(email): 如果配置了 AUTH_API_ENDPOINT 则请求后端发送邮箱验证码，否则在本地生成并保存验证码
+        // - verifyCode(email, code): 校验本地保存或依赖后端响应
+        function isValidEmail(email){
+            return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
+        }
+
+        function saveAuthCode(email, code){
+            const expires = Date.now() + 15*60*1000; // 15 分钟有效期
+            localStorage.setItem('auth_code_' + email, JSON.stringify({code, expires}));
+        }
+
+        function loadAuthCode(email){
+            try{ return JSON.parse(localStorage.getItem('auth_code_' + email)); }catch(e){return null}
+        }
+
+        async function sendVerification(email){
+            if(!isValidEmail(email)){
+                alert('请输入有效邮箱地址');
+                return null;
+            }
+            if(AUTH_API_ENDPOINT){
+                try{
+                    const r = await fetch(AUTH_API_ENDPOINT + '/send-code', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email})});
+                    const body = await r.json().catch(()=>null);
+                    if(r.ok){
+                        // 如果后端返回 devCode（开发模式），一并展示以便联调
+                        if(body && body.devCode){
+                            alert(translations[localStorage.getItem('siteLang')||'zh'].login_sent_notice + '\n开发验证码：' + body.devCode);
+                        } else {
+                            alert(translations[localStorage.getItem('siteLang')||'zh'].login_sent_notice);
+                        }
+                        return true;
+                    } else {
+                        console.error('auth send failed', body || await r.text());
+                        alert('发送验证码失败');
+                        return false;
+                    }
+                } catch(e){ console.error(e); alert('发送验证码失败'); return false; }
+            } else {
+                // dev mode: 生成本地验证码并显示
+                const code = String(Math.floor(100000 + Math.random()*900000));
+                saveAuthCode(email, code);
+                alert((translations[localStorage.getItem('siteLang')||'zh'].login_sent_notice) + '\n开发验证码：' + code);
+                return true;
+            }
+        }
+
+        function verifyCodeLocal(email, code){
+            const rec = loadAuthCode(email);
+            if(!rec) return false;
+            if(Date.now() > rec.expires) return false;
+            return String(rec.code) === String(code).trim();
+        }
+
+        async function verifyCode(email, code){
+            if(AUTH_API_ENDPOINT){
+                try{
+                    const r = await fetch(AUTH_API_ENDPOINT + '/verify', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email, code})});
+                    return r.ok;
+                } catch(e){ console.error(e); return false; }
+            } else {
+                return verifyCodeLocal(email, code);
+            }
+        }
+
+        function setLoggedIn(email){
+            localStorage.setItem('userEmail', email);
+            renderAuthState();
+        }
+
+        function logout(){
+            localStorage.removeItem('userEmail');
+            renderAuthState();
+        }
+
+        function renderAuthState(){
+            const area = document.getElementById('auth-area');
+            const user = localStorage.getItem('userEmail');
+            const lang = localStorage.getItem('siteLang') || 'zh';
+            if(!area) return;
+            if(user){
+                area.innerHTML = `<div class="flex items-center gap-3"><span class="text-sm text-gray-700">${escapeHtml(translations[lang].login_logged_in)} ${escapeHtml(user)}</span><button id="btn-logout" class="ml-2 px-3 py-1 rounded border text-sm">${escapeHtml(translations[lang].login_logout)}</button></div>`;
+                document.getElementById('btn-logout')?.addEventListener('click', logout);
+            } else {
+                area.innerHTML = `<button id="btn-login" class="btn-apple px-4 py-1 rounded-full text-xs" data-i18n="login">${escapeHtml(translations[lang].login)}</button>`;
+                document.getElementById('btn-login')?.addEventListener('click', openLoginModal);
+            }
+        }
+
+        function openLoginModal(){
+            if(document.getElementById('login-modal')) return;
+            const wrapper = document.createElement('div');
+            wrapper.id = 'login-modal';
+            wrapper.className = 'fixed inset-0 z-70 flex items-center justify-center bg-black/40';
+            wrapper.innerHTML = `
+                <div class="bg-white rounded-xl w-full max-w-md p-6">
+                    <h3 class="text-lg font-bold mb-4" data-i18n="login_modal_title">邮箱登录</h3>
+                    <div class="grid gap-3">
+                        <input id="login-email" class="border p-2 rounded" placeholder="邮箱地址" data-i18n="login_email">
+                        <div class="flex gap-2">
+                            <button id="login-send" class="flex-1 px-3 py-2 rounded border text-sm" data-i18n="login_send_code">发送验证码</button>
+                            <input id="login-code" class="w-36 border p-2 rounded" placeholder="验证码" data-i18n="login_code_placeholder">
+                        </div>
+                    </div>
+                    <div class="mt-4 flex justify-end space-x-2">
+                        <button id="login-cancel" class="px-4 py-2 rounded border text-sm" onclick="document.getElementById('login-modal')?.remove()">取消</button>
+                        <button id="login-verify" class="px-4 py-2 rounded bg-blue-600 text-white text-sm" data-i18n="login_verify">验证并登录</button>
+                    </div>
+                    <p id="login-note" class="text-xs text-gray-500 mt-3"></p>
+                </div>
+            `;
+            document.body.appendChild(wrapper);
+            applyLang(localStorage.getItem('siteLang') || 'zh');
+            document.getElementById('login-send').addEventListener('click', async ()=>{
+                const email = document.getElementById('login-email').value.trim();
+                const ok = await sendVerification(email);
+                if(ok) document.getElementById('login-note').textContent = translations[localStorage.getItem('siteLang')||'zh'].login_sent_notice;
+            });
+            document.getElementById('login-verify').addEventListener('click', async ()=>{
+                const email = document.getElementById('login-email').value.trim();
+                const code = document.getElementById('login-code').value.trim();
+                const ok = await verifyCode(email, code);
+                if(ok){
+                    setLoggedIn(email);
+                    document.getElementById('login-modal')?.remove();
+                } else {
+                    alert(translations[localStorage.getItem('siteLang')||'zh'].login_invalid_code);
+                }
+            });
+        }
+
+        function applyLang(lang){
+            document.documentElement.lang = (lang === 'zh') ? 'zh-CN' : 'kk';
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.dataset.i18n;
+                const text = translations[lang][key];
+                if(!text) return;
+                const tag = el.tagName.toLowerCase();
+                if(tag === 'input' || tag === 'textarea'){
+                    el.placeholder = text;
+                } else {
+                    el.innerHTML = text.replace(/\n/g, '<br>');
+                }
+            });
+            document.querySelectorAll('[data-lang]').forEach(img => {
+                img.style.opacity = (img.dataset.lang === lang) ? '1' : '0.6';
+            });
+            localStorage.setItem('siteLang', lang);
+            // 更新认证区文本（如果已登录/未登录需要刷新显示）
+            if(typeof renderAuthState === 'function') renderAuthState();
+        }
+
+        // 求职意向存储与渲染
+        const SEEK_KEY = 'seekIntents_v1';
+
+        function loadSeeks(){
+            try{ return JSON.parse(localStorage.getItem(SEEK_KEY) || '[]'); }
+            catch(e){ return []; }
+        }
+
+        function saveSeeks(list){
+            localStorage.setItem(SEEK_KEY, JSON.stringify(list));
+        }
+
+        function renderSeekList(){
+            const list = loadSeeks();
+            const container = document.getElementById('seek-list');
+            const empty = document.getElementById('seek-empty');
+            container.innerHTML = '';
+            if(!list.length){ empty.style.display = 'block'; return; }
+            empty.style.display = 'none';
+            list.slice().reverse().forEach(item => {
+                const el = document.createElement('div');
+                el.className = 'bg-white border border-gray-100 p-4 rounded-lg flex justify-between items-start';
+                el.innerHTML = `
+                    <div>
+                        <div class="font-bold text-lg">${escapeHtml(item.position || '—')} · ${escapeHtml(item.city || '')}</div>
+                        <div class="text-sm text-gray-600 mt-1">${escapeHtml(item.name || '')} · ${escapeHtml(item.contact || '')}</div>
+                        <p class="text-sm text-gray-700 mt-2">${escapeHtml(item.summary || '')}</p>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-sm text-gray-500">${new Date(item.time).toLocaleString()}</div>
+                        <div class="mt-2 text-sm text-gray-800 font-semibold">${escapeHtml(item.salary || '')}</div>
+                        <button class="mt-3 text-xs text-red-500" data-id="${item.id}">删除</button>
+                    </div>
+                `;
+                el.querySelector('button')?.addEventListener('click', e => {
+                    const id = e.currentTarget.dataset.id;
+                    deleteSeek(id);
+                });
+                container.appendChild(el);
+            });
+        }
+
+        function deleteSeek(id){
+            const list = loadSeeks().filter(i => String(i.id) !== String(id));
+            saveSeeks(list);
+            renderSeekList();
+        }
+
+        function escapeHtml(str){
+            if(!str) return '';
+            return String(str).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+        }
+
+        // 模态表单创建与控制
+        function openSeekModal(){
+            if(document.getElementById('seek-modal')) return;
+            const wrapper = document.createElement('div');
+            wrapper.id = 'seek-modal';
+            wrapper.className = 'fixed inset-0 z-60 flex items-center justify-center bg-black/40';
+            wrapper.innerHTML = `
+                <div class="bg-white rounded-xl w-full max-w-lg p-6">
+                    <h3 class="text-lg font-bold mb-4" data-i18n="seek_modal_title">发布求职意向</h3>
+                    <div class="grid gap-3">
+                        <input class="border p-2 rounded" id="seek-name" placeholder="姓名" data-i18n="seek_name">
+                        <input class="border p-2 rounded" id="seek-contact" placeholder="联系方式" data-i18n="seek_contact">
+                        <input class="border p-2 rounded" id="seek-city" placeholder="目标城市" data-i18n="seek_city">
+                        <input class="border p-2 rounded" id="seek-position" placeholder="期望职位" data-i18n="seek_position">
+                        <textarea class="border p-2 rounded" id="seek-summary" rows="3" placeholder="个人简介 / 工作经验" data-i18n="seek_summary"></textarea>
+                        <input class="border p-2 rounded" id="seek-salary" placeholder="薪资期望" data-i18n="seek_salary">
+                        <label class="flex items-center gap-2 mt-2"><input type="checkbox" id="seek-sync" class="w-4 h-4"> <span data-i18n="seek_sync_label">同步到服务器</span></label>
+                    </div>
+                    <div class="mt-4 flex justify-end space-x-2">
+                        <button id="seek-cancel" class="px-4 py-2 rounded border text-sm" data-i18n="seek_cancel">取消</button>
+                        <button id="seek-submit" class="px-4 py-2 rounded bg-blue-600 text-white text-sm" data-i18n="seek_submit">发布</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(wrapper);
+            applyLang(localStorage.getItem('siteLang') || 'zh');
+            document.getElementById('seek-cancel').addEventListener('click', closeSeekModal);
+            document.getElementById('seek-submit').addEventListener('click', submitSeek);
+        }
+
+        function closeSeekModal(){
+            const m = document.getElementById('seek-modal');
+            if(m) m.remove();
+        }
+
+        async function submitSeek(){
+            const name = document.getElementById('seek-name').value.trim();
+            const contact = document.getElementById('seek-contact').value.trim();
+            const city = document.getElementById('seek-city').value.trim();
+            const position = document.getElementById('seek-position').value.trim();
+            const summary = document.getElementById('seek-summary').value.trim();
+            const salary = document.getElementById('seek-salary').value.trim();
+            if(!position){ alert('请输入期望职位'); return; }
+            const list = loadSeeks();
+            const item = { id: Date.now(), name, contact, city, position, summary, salary, time: Date.now() };
+            list.push(item);
+            saveSeeks(list);
+            // 如果选中同步且配置了 API_ENDPOINT，则尝试同步
+            const syncChecked = document.getElementById('seek-sync')?.checked;
+            if(syncChecked){
+                if(!API_ENDPOINT){
+                    alert(translations[localStorage.getItem('siteLang') || 'zh'].sync_no_endpoint);
+                } else {
+                    try{
+                        const resp = await fetch(API_ENDPOINT, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(item)
+                        });
+                        if(resp.ok){
+                            alert(translations[localStorage.getItem('siteLang') || 'zh'].sync_success);
+                        } else {
+                            console.error('sync failed', await resp.text());
+                            alert(translations[localStorage.getItem('siteLang') || 'zh'].sync_fail);
+                        }
+                    } catch(err){
+                        console.error('sync err', err);
+                        alert(translations[localStorage.getItem('siteLang') || 'zh'].sync_fail);
+                    }
+                }
+            }
+            closeSeekModal();
+            renderSeekList();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('[data-lang]').forEach(img => {
+                img.addEventListener('click', () => applyLang(img.dataset.lang));
+            });
+            const saved = localStorage.getItem('siteLang') || 'zh';
+            applyLang(saved);
+
+            // 渲染登录状态（按钮或已登录显示）
+            if(typeof renderAuthState === 'function') renderAuthState();
+
+            // 初始化求职相关按钮与列表
+            document.getElementById('btn-post-seek')?.addEventListener('click', (e) => { e.preventDefault(); openSeekModal(); });
+            renderSeekList();
+        });
+    </script>
+
+</body>
+</html>
