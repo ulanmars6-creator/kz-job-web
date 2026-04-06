@@ -1,5 +1,5 @@
 // 简单内存存储，仅用于示例（生产环境请使用数据库）
-const codes = new Map(); // email -> { code, expires }
+const { codes } = require('./storage');
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {

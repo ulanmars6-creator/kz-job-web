@@ -1,8 +1,5 @@
 const nodemailer = require('nodemailer');
-
-// 简单内存存储，仅用于示例
-const codes = new Map(); // email -> { code, expires }
-const rateLimit = new Map(); // email -> { lastSent }
+const { codes, rateLimit } = require('./storage');
 
 // 创建邮件传输（如果未配置，会保留为 null）
 let transporter = null;
