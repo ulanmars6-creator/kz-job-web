@@ -85,11 +85,50 @@ python3 -m http.server 8000
 
 ## API 端点
 
+### 认证
 - `POST /api/send-code` - 发送验证码
-- `POST /api/verify` - 验证验证码
-- `GET/POST /api/jobs` - 职位管理
-- `GET/POST /api/seeks` - 求职管理
-- `GET/POST /api/profile` - 用户资料管理
+  - 请求体: `{ "email": "user@example.com" }`
+  - 响应: `{ "ok": true }` 或 `{ "ok": true, "devCode": "123456" }` (开发模式)
+
+- `POST /api/verify` - 验证验证码并登录
+  - 请求体: `{ "email": "user@example.com", "code": "123456" }`
+  - 响应: `{ "ok": true, "token": "jwt-token", "user": { "email": "user@example.com" } }`
+
+### 职位管理
+- `GET /api/jobs` - 获取所有职位
+  - 响应: `{ "jobs": [...] }`
+
+- `POST /api/jobs` - 发布职位 (需要认证)
+  - 请求头: `Authorization: Bearer <token>`
+  - 请求体: `{ "title": "职位名称", "company": "公司", "location": "地点", "salary": "薪资", "description": "描述", "requirements": "要求", "contact": "联系方式" }`
+  - 响应: `{ "ok": true, "job": {...} }`
+
+- `DELETE /api/jobs?id=<jobId>` - 删除职位 (需要认证，且只能删除自己的职位)
+  - 请求头: `Authorization: Bearer <token>`
+  - 响应: `{ "ok": true }`
+
+### 求职管理
+- `GET /api/seeks` - 获取所有求职意向
+  - 响应: `{ "seeks": [...] }`
+
+- `POST /api/seeks` - 发布求职意向 (需要认证)
+  - 请求头: `Authorization: Bearer <token>`
+  - 请求体: `{ "name": "姓名", "contact": "联系方式", "city": "城市", "position": "职位", "summary": "简介", "salary": "薪资期望" }`
+  - 响应: `{ "ok": true, "seek": {...} }`
+
+- `DELETE /api/seeks?id=<seekId>` - 删除求职意向 (需要认证，且只能删除自己的)
+  - 请求头: `Authorization: Bearer <token>`
+  - 响应: `{ "ok": true }`
+
+### 个人资料
+- `GET /api/profile` - 获取个人资料 (需要认证)
+  - 请求头: `Authorization: Bearer <token>`
+  - 响应: `{ "user": {...} }`
+
+- `POST /api/profile` - 更新个人资料 (需要认证)
+  - 请求头: `Authorization: Bearer <token>`
+  - 请求体: `{ "name": "姓名", "phone": "电话", "location": "城市", "bio": "简介", "skills": "技能", "experience": "经验" }`
+  - 响应: `{ "ok": true, "user": {...} }`
 
 ## 技术栈
 

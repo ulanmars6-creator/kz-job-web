@@ -1,5 +1,6 @@
-// 简单内存存储，仅用于示例（生产环境请使用数据库）
+// 验证邮箱验证码并发放JWT token
 const { codes } = require('./storage');
+const { generateToken } = require('./middleware/auth');
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -8,13 +9,15 @@ export default async function handler(req, res) {
 
   const { email, code } = req.body || {};
   if(!email || !code){
-    return res.status(400).json({ error: 'invalid_payload' });
+    return res.status(400).json({ error: '邮箱和验证码不能为空' });
   }
   const rec = codes.get(email);
-  if(!rec) return res.status(400).json({ ok:false, error: 'no_code' });
-  if(Date.now() > rec.expires) { codes.delete(email); return res.status(400).json({ ok:false, error:'expired' }); }
-  if(String(rec.code) !== String(code).trim()) return res.status(400).json({ ok:false, error:'invalid' });
-  // 验证通过：移除并返回成功（此处应创建会话/发放 token，这里仅示例）
+  if(!rec) return res.status(400).json({ ok:false, error: '验证码不存在' });
+  if(Date.now() > rec.expires) { codes.delete(email); return res.status(400).json({ ok:false, error:'验证码已过期' }); }
+  if(String(rec.code) !== String(code).trim()) return res.status(400).json({ ok:false, error:'验证码错误' });
+
+  // 验证通过：移除验证码并发放JWT token
   codes.delete(email);
-  return res.json({ ok: true });
+  const token = generateToken({ email });
+  return res.json({ ok: true, token, user: { email } });
 }

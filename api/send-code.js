@@ -29,15 +29,15 @@ function canSend(email){
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return res.status(405).json({ error: '不支持的请求方法' });
   }
 
   const { email } = req.body || {};
   if(!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){
-    return res.status(400).json({ error: 'invalid_email' });
+    return res.status(400).json({ error: '邮箱格式不正确' });
   }
   if(!canSend(email)){
-    return res.status(429).json({ error: 'rate_limited' });
+    return res.status(429).json({ error: '发送过于频繁，请稍后再试' });
   }
   const code = generateCode();
   const expires = Date.now() + 15*60*1000; // 15 分钟
@@ -55,7 +55,7 @@ export default async function handler(req, res) {
       return res.json({ ok: true, messageId: info.messageId });
     } catch(err){
       console.error('mail send error', err);
-      return res.status(500).json({ ok:false, error: 'mail_failed' });
+      return res.status(500).json({ ok:false, error: '邮件发送失败，请稍后重试' });
     }
   } else {
     // 开发模式：将验证码返回给客户端（仅用于本地测试）

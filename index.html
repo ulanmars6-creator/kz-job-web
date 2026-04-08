@@ -330,7 +330,12 @@
             if(AUTH_API_ENDPOINT){
                 try{
                     const r = await fetch(AUTH_API_ENDPOINT + '/verify', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email, code})});
-                    return r.ok;
+                    const body = await r.json();
+                    if(r.ok && body.token){
+                        localStorage.setItem('authToken', body.token);
+                        return true;
+                    }
+                    return false;
                 } catch(e){ console.error(e); return false; }
             } else {
                 return verifyCodeLocal(email, code);
@@ -344,6 +349,7 @@
 
         function logout(){
             localStorage.removeItem('userEmail');
+            localStorage.removeItem('authToken');
             renderAuthState();
         }
 
@@ -471,8 +477,13 @@
 
             // 如果配置了 API，尝试从服务器获取
             if(JOBS_API){
+                const token = localStorage.getItem('authToken');
                 try{
-                    const resp = await fetch(JOBS_API);
+                    const resp = await fetch(JOBS_API, {
+                        headers: {
+                            'Authorization': token ? `Bearer ${token}` : ''
+                        }
+                    });
                     if(resp.ok){
                         const data = await resp.json();
                         jobs = data.jobs || [];
@@ -624,10 +635,14 @@
             // 如果选中同步，则同步到服务器
             const syncChecked = document.getElementById('job-sync')?.checked;
             if(syncChecked && JOBS_API){
+                const token = localStorage.getItem('authToken');
                 try{
                     const resp = await fetch(JOBS_API, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Authorization': token ? `Bearer ${token}` : ''
+                        },
                         body: JSON.stringify(job)
                     });
                     if(resp.ok){
@@ -659,7 +674,32 @@
         }
 
         function renderSeekList(){
-            const list = loadSeeks();
+            let list = loadSeeks();
+
+            // 如果配置了 API，尝试从服务器获取
+            if(SEEKS_API){
+                const token = localStorage.getItem('authToken');
+                fetch(SEEKS_API, {
+                    headers: {
+                        'Authorization': token ? `Bearer ${token}` : ''
+                    }
+                })
+                .then(resp => resp.ok ? resp.json() : Promise.reject())
+                .then(data => {
+                    list = data.seeks || [];
+                    saveSeeks(list);
+                    renderSeekListInternal(list);
+                })
+                .catch(e => {
+                    console.log('Failed to load seeks from server, using local data');
+                    renderSeekListInternal(list);
+                });
+            } else {
+                renderSeekListInternal(list);
+            }
+        }
+
+        function renderSeekListInternal(list){
             const container = document.getElementById('seek-list');
             const empty = document.getElementById('seek-empty');
             container.innerHTML = '';
@@ -700,7 +740,29 @@
             });
         }
 
-        function deleteSeek(id){
+        async function deleteSeek(id){
+            // 尝试从服务器删除
+            if(SEEKS_API){
+                const token = localStorage.getItem('authToken');
+                try{
+                    const resp = await fetch(`${SEEKS_API}?id=${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': token ? `Bearer ${token}` : ''
+                        }
+                    });
+                    if(resp.ok){
+                        // 从本地也删除
+                        const list = loadSeeks().filter(i => String(i.id) !== String(id));
+                        saveSeeks(list);
+                        renderSeekList();
+                        return;
+                    }
+                } catch(e){
+                    console.error('Server delete failed, trying local');
+                }
+            }
+            // 本地删除
             const list = loadSeeks().filter(i => String(i.id) !== String(id));
             saveSeeks(list);
             renderSeekList();
@@ -761,10 +823,14 @@
             // 如果选中同步，则尝试同步到服务器
             const syncChecked = document.getElementById('seek-sync')?.checked;
             if(syncChecked){
+                const token = localStorage.getItem('authToken');
                 try{
                     const resp = await fetch(SEEKS_API, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Authorization': token ? `Bearer ${token}` : ''
+                        },
                         body: JSON.stringify(item)
                     });
                     if(resp.ok){
@@ -824,7 +890,12 @@
 
             // 尝试从服务器获取
             if(PROFILE_API){
-                fetch(`${PROFILE_API}?email=${encodeURIComponent(user)}`)
+                const token = localStorage.getItem('authToken');
+                fetch(PROFILE_API, {
+                    headers: {
+                        'Authorization': token ? `Bearer ${token}` : ''
+                    }
+                })
                     .then(resp => resp.ok ? resp.json() : null)
                     .then(data => {
                         if(data && data.user){
@@ -875,10 +946,14 @@
 
             // 同步到服务器
             if(PROFILE_API){
+                const token = localStorage.getItem('authToken');
                 try{
                     const resp = await fetch(PROFILE_API, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Authorization': token ? `Bearer ${token}` : ''
+                        },
                         body: JSON.stringify(profile)
                     });
                     if(resp.ok){
@@ -896,6 +971,15 @@
 
             document.getElementById('profile-modal')?.remove();
         }
+            document.querySelectorAll('[data-lang]').forEach(img => {
+                img.addEventListener('click', () => applyLang(img.dataset.lang));
+            });
+            const saved = localStorage.getItem('siteLang') || 'zh';
+            applyLang(saved);
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            // 语言切换
             document.querySelectorAll('[data-lang]').forEach(img => {
                 img.addEventListener('click', () => applyLang(img.dataset.lang));
             });
